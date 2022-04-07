@@ -5,3 +5,6 @@
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+bot/credentials.json
+bot/__pycache__
+bot/data_utils/__pycache__

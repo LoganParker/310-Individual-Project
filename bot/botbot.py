@@ -4,6 +4,7 @@ from data_utils.data_load import get_query_objects
 from spellchecker import SpellChecker
 import random
 
+
 TEXT_BODY_PATH = './text/atlantis.txt'
 ENTITY_DICT_PATH = 'data_utils/entity_dict.json'
 greetings = syn_detection.detect_syn("hello")
@@ -36,7 +37,7 @@ def spell_check(input):
 
 def get_response(query):
     """
-    This function recieves the keyword dictionary, asks for user input, and returns chat bot responses. 
+    This function receives the keyword dictionary, asks for user input, and returns chat bot responses.
     User input is processed using get_query_objects(), which extracts nouns and propper nouns. 
     A for-loop iterates through each processed noun in a list and detects if the word exists in entity_dict.json. 
     If there is a match, that means there is a chat bot response for the keyword. If there is no keyword detected in the user response, 
@@ -49,10 +50,8 @@ def get_response(query):
     Returns:
         output: a string containing the bots response
     """
-    
-    #entity_dict = get_entity_dict(ENTITY_DICT_PATH)
 
-    response = []
+    response = [None,None]
     # Find the objects in the user query
     for greeting in greetings:
         if greeting in query.lower().split():
@@ -62,13 +61,8 @@ def get_response(query):
         return responses[random.randint(0, len(responses) - 1)]
 
     else:
-        response = search_json.search_noun_quest(query_objects[0], query_objects[1])
-    # for obj in query_objects:
-    #
-    #     if obj in entity_dict:
-    #         response.append(entity_dict[obj])
-    #     else:
-    #         # Satisfies 5 possible responses for out of topic questions
-    #         return responses[random.randint(0, len(responses))]
-
-    return " ".join(response)
+        print(query_objects)
+        response[0] = search_json.search_noun_quest(query_objects[0], query_objects[1])
+        response[1] = query_objects[0]
+        print(response)
+    return response

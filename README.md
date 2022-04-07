@@ -8,7 +8,7 @@ Our project is going to be an interactive chatbot that takes on the role of a wo
 
 1. Download our GitHub repo 
 2. Open the repo using VSCode or Terminal 
-3. run `run_me_first.sh` (If you are uncomfortable running a bash script refer to dependencies.) 
+3. update your environment path on line 7 of `run_me_first.sh` to point to the json credentials file. Then run `run_me_first.sh` (If you are uncomfortable running a bash script refer to dependencies.) 
 4. Run gui.py 
 
 ## Dependencies
@@ -17,8 +17,13 @@ This bot requires nltk, pyspechecker, and stanza in order to run properly. If yo
     pip install nltk
     pip install pyspellchecker
     pip install stanza
+    pip install --upgrade google-cloud-translate
+    pip install requests
+
+This bot also requires an environment variable pointing to the credentials for the translation api. For instructions on 
+how to do this, please refer to line 7 of `run_me_first.sh`.
     
-Then you have to run py_lib_install.py so python can install the additional libraries. 
+Once the previous steps are completed, you must run `py_lib_install.py` so python can install the additional libraries. 
 
 ## Dataset 
 This bot pulls from a json file with specifically designed responses for who, what, where, when, why style responses. Essentially, this bot smartly translates user text into queries to generate aproprait responses. 
@@ -133,9 +138,8 @@ Parameters
  
 Returns
  - questList: list of adverbs associated with said noun
-
-
-### unitTest.py  FIX THIS 
+ 
+### unitTest.py
 
 #### test_spell_check
 Tests functionality of `spell_check()` function in bot.py
@@ -146,16 +150,81 @@ Tests functionality of `get_response(query)` function in bot.py
 #### test_load_data
 Tests functionality of `load_data()` 
 
+### api_controller.py
+
+For retrieving visualizations regarding the ongoing conversation.
+
+#### update_image(search_tag)
+
+Updates the image that will be shown when the visualization button is clicked.
+
+Parameters
+- search_tag: the topic regarding the most recent question asked
+
+Returns: URL retrieved from `url_builder`
+
+
+#### url_builder(response)
+
+Constructs the image url from the Flickr API response
+
+**Parameters**
+- _response_: a json object retrieved from `update_image` which contains all necessary information to build the image URL
+
+**Returns**: An image URL string obtained from the Flickr API
+
+### translator.py
+
+For translating input back into the Chatbots native language
+
+#### translate_text(text, lang_code, project_id)
+
+Translates the users input from the detected language back to english
+
+**Parameters**:
+- _text_: The text to be translated
+- _lang_code_: the language code of the language the text to be translated is in
+- _project_id_: the Google project ID
+
+**Returns**: The english equivalent of the text string inputted
+
+#### detect_language(in_string, project_id)
+
+Determines the language the inputted string is written in
+
+**Parameters**:
+- _in_string_: The text to be translated
+- _project_id_: the Google project ID
+
+**Returns**: The language code of the language that was inputted
+
+
+#### get_translation(in_string)
+
+Reads the user input, detects the language input using `detect_language` and then translates it using `translate_text`
+
+**Parameters**:
+- _in_string_: The text to be translated
+
+**Returns**: The english equivalent of the input
+
+
 ## New Features
 
-### Spell Checking
+### Google Translation API
 
-Spell checking was used in order to improve the overall robustness of our chatbot. Incorrectly spelt words are recognized by our system, and replaced with what is assumed to be the most likley word that the user intended to input. This allows our bot to handle a wide variety of cases that it previously was unable to.
+In order to enhance the agents conversational abilities, I have added the ability for it to understand questions asked in
+several languages. Our agent can translate questions asked in any language, and then reply in its native language 
+of english. This is done within the `translator.py` class which makes use of the Advanced Google Translate API to detect
+the language which is input, translate it, and then generate its standard reply. 
 
-### Synonym Detection
 
-Synonym detection was used in our chatbot in order to improve the greeting function. Rather than hardcode a large if statement containing some number of standard greetings, we used synonym detection to recognize when a greeting word was input, in order to then output the bots standard greeting.
+### Flickr API
 
-### POS Tagging, Tokenization & Segmentation
+To further enhance the conversation had with our agent, I have implemented a way to better visualize what our agent is discussing.
+This is done using the Flickr API, which pulls images from Flickr that are related to the most recently asked question. 
+These images are opened up in your systems default browser. This was implemented within `api_controller.py`. Due to the 
+nature of Flickr, some images that are shown may not be as related as desired, because people may upload photos and tag 
+them incorrectly.
 
-In order to better suit the keyword style bot that we have created, we needed to implement a way of understanding sentences that were input, and extract the necessary information required to generate a query that the bot can use to get a response. To do this, we used POS tagging, tokenization, and segmentation. These systems work together to process questions asked, and provide us with a query in the form of \<Noun\> \<Descriptor\> which we use to generate much more intricate and conversational dialogue.
+

@@ -1,7 +1,7 @@
 import sys
 import tkinter as tk
-import botbot
-
+import botbot, translator, api_controller
+import webbrowser
 
 # Class for the Bot GUI
 class BotGUI(tk.Tk):
@@ -49,22 +49,26 @@ class ChatScreen(tk.Frame):
         # Remove unnecessary punctuation
         punctuation = '!()-[]{};:\,<>./?@#$%^&*_~'
         for char in punctuation:
-            userInput = userInput.replace(char,' ')
+            userInput = userInput.replace(char, ' ')
+
+        # Get translation
+        userInput = translator.get_translation(userInput)
         # Pass input through spell checking module
         input = botbot.spell_check(userInput)
         print(input)
         # Get response from bot & update response label
         self.response = botbot.get_response(input)
-        print("Response", self.response)
-        self.responseLabel["text"] = self.response
+        print("Response", self.response[0])
+        self.responseLabel["text"] = self.response[0]
+        self.responsetopic = self.response[1]
 
     def show_help_popup(self):
-        self.responseLabel["text"] = "Welcome, Adventurer! Please enter your question below.\n When you are done, " \
-                                     "please end your question with a '?' and hit the 'Send' button below!"
+        webbrowser.open(api_controller.update_image(self.responsetopic))
 
     def __init__(self, master):
         self.response = "Welcome, Adventurer! Please enter your question below.\n When you are done, please end your " \
                         "question with a '?' and hit the 'Send' button below!"
+        self.responsetopic = "Atlantis"
         tk.Frame.__init__(self, master)
         # Response label is what the bot response will be output to
         self.responseLabel = tk.Label(self, text=self.response)
@@ -74,10 +78,11 @@ class ChatScreen(tk.Frame):
         # Bottom row of buttons
         tk.Button(self, text="Send",
                   command=lambda: self.retrieve_user_message(userInputField)).pack(side="left")
-        tk.Button(self, text="Help",
+        tk.Button(self, text="Visualize",
                   command=lambda: self.show_help_popup()).pack(side="left")
         tk.Button(self, text="Back",
                   command=lambda: master.switch_frame(HomeScreen)).pack(side="left")
+
 
 
 botInterface = BotGUI()

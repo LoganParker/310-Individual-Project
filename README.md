@@ -1,4 +1,6 @@
-# 310-Group-Project
+# 310-Individual-Project
+
+Logan Parker
 
 ## Project Description 
 
